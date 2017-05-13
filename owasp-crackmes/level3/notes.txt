@@ -1,0 +1,20 @@
+1|bullhead:/ # ps|grep uncrack
+u0_a92    7593  563   1633840 76644 SyS_epoll_ 7f99a8fb6c S sg.vantagepoint.uncrackable3
+u0_a92    7614  7593  1585956 37604 ptrace_sto 7f99b37e3c t sg.vantagepoint.uncrackable3
+
+
+
+05-06 16:58:39.353  9623 10651 I ActivityManager: Start proc 15027:sg.vantagepoint.uncrackable3/u0a92 for activity sg.vantagepoint.uncrackable3/.MainActivity
+05-06 16:58:40.096 15027 15027 V UnCrackable3: CRC[lib/armeabi/libfoo.so] = 1285790320
+05-06 16:58:40.096 15027 15027 V UnCrackable3: CRC[lib/mips/libfoo.so] = 839666376
+05-06 16:58:40.096 15027 15027 V UnCrackable3: CRC[lib/armeabi-v7a/libfoo.so] = 2238279083
+05-06 16:58:40.096 15027 15027 V UnCrackable3: CRC[lib/arm64-v8a/libfoo.so] = 2185392167
+05-06 16:58:40.096 15027 15027 V UnCrackable3: CRC[lib/mips64/libfoo.so] = 2232215089
+05-06 16:58:40.096 15027 15027 V UnCrackable3: CRC[lib/x86_64/libfoo.so] = 1653680883
+05-06 16:58:40.097 15027 15027 V UnCrackable3: CRC[lib/x86/libfoo.so] = 1546037721
+05-06 16:58:40.097 15027 15027 V UnCrackable3: CRC[classes.dex] = 2378563664
+05-06 16:58:40.147  9623  9666 W ActivityManager: Activity pause timeout for ActivityRecord{c60e966 u0 sg.vantagepoint.uncrackable3/.MainActivity t50}
+05-06 16:58:40.154 15027 15047 V UnCrackable3: Tampering detected! Terminating...
+--------- beginning of crash
+05-06 16:58:40.154 15027 15047 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 15047 (nt.uncrackable3)
+05-06 16:58:40.154   344   344 W         : debuggerd: handling request: pid=15027 uid=10092 gid=10092 tid=15047
