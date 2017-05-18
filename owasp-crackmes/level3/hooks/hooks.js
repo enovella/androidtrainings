@@ -27,8 +27,29 @@ send("arch: " + arch);
 *
 ***************************************************/
 
+
+
+// void *dlopen(const char *filename, int flags);
+/*Interceptor.attach(Module.findExportByName("libc.so", "dlopen"), {
+
+    onEnter: function (args) {
+
+        this.filename = args[0];
+        this.flags    = parseInt(args[1]);
+    },
+
+    onLeave: function (retval) {
+    	filename = Memory.readUtf8String(this.filename);
+
+        send("onEnter() dlopen(\"" + filename + "\",\"" + this.flags + "\");");
+        if ( filename.indexOf("foo") != -1 ) {
+			send("do_native_hooks_libfoo now!");
+        }
+    }
+});*/
+
 // char *strstr(const char *haystack, const char *needle);
-/*Interceptor.attach(Module.findExportByName("libc.so", "strstr"), {
+Interceptor.attach(Module.findExportByName("libc.so", "strstr"), {
 
     onEnter: function (args) {
 
@@ -61,7 +82,7 @@ send("arch: " + arch);
         return retval;
     }
 });
-*/
+
 
 function do_native_hooks_libfoo(){
 
@@ -70,14 +91,14 @@ function do_native_hooks_libfoo(){
 		send("p_foo is null (libfoo.so). Returning now...");
 		return 0;
 	}
-    var p_protect_secret = p_foo.add(offset_protect_secret64);
+    //var p_protect_secret = p_foo.add(offset_protect_secret64);
 	var p_strncmp_xor64  = p_foo.add(offset_strncmp_xor64);
 	send("libfoo.so          @ " + p_foo.toString());
-	send("ptr_protect_secret @ " + p_protect_secret.toString());
+	//send("ptr_protect_secret @ " + p_protect_secret.toString());
 	send("ptr_strncmp_xor64  @ " + p_strncmp_xor64.toString());
 
 
-	Interceptor.attach( p_protect_secret, {
+/*	Interceptor.attach( p_protect_secret, {
 	    onEnter: function (args) {
 	        send("onEnter() p_protect_secret");
 	        send("args[0]: " + args[0]);
@@ -86,7 +107,7 @@ function do_native_hooks_libfoo(){
 	    onLeave: function (retval) {
 	        send("onLeave() p_protect_secret");
 	     }
-	});
+	});*/
 
 	Interceptor.attach( p_strncmp_xor64, {
 	    onEnter: function (args) {
@@ -119,24 +140,24 @@ function do_native_hooks_libfoo(){
 
 // int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg);
 var p_pthread_create = Module.findExportByName("libc.so", "pthread_create");
-var pthread_create = new NativeFunction( p_pthread_create, 'int', ['pointer','pointer','pointer','pointer']);
+var pthread_create = new NativeFunction( p_pthread_create, "int", ["pointer", "pointer", "pointer", "pointer"]);
 send("NativeFunction pthread_create() replaced @ " + pthread_create);
 
 Interceptor.replace( p_pthread_create, new NativeCallback(function (ptr0, ptr1, ptr2, ptr3) {
     send("pthread_create() overloaded");
     var ret = ptr(0);
     if (ptr1.isNull() && ptr3.isNull()) {
-    	send("loading fake pthread_create because ptr1 and ptr3 are equal to 0!");
+        send("loading fake pthread_create because ptr1 and ptr3 are equal to 0!");
     } else {
-    	send("loading real pthread_create()");
-    	ret = pthread_create(ptr0,ptr1,ptr2,ptr3);
+        send("loading real pthread_create()");
+        ret = pthread_create(ptr0,ptr1,ptr2,ptr3);
     }
 
     do_native_hooks_libfoo();
 
     send("ret: " + ret);
 
-}, 'int', ['pointer','pointer','pointer','pointer']));
+}, "int", ["pointer", "pointer", "pointer", "pointer"]));
 
 
 
@@ -167,7 +188,7 @@ Interceptor.attach(ptr(p_pthread_create), {
         }
         return retval;
     }
-});*/
+});
 
 
 
