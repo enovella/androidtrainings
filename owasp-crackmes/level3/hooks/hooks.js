@@ -28,26 +28,6 @@ send("arch: " + arch);
 ***************************************************/
 
 
-
-// void *dlopen(const char *filename, int flags);
-/*Interceptor.attach(Module.findExportByName("libc.so", "dlopen"), {
-
-    onEnter: function (args) {
-
-        this.filename = args[0];
-        this.flags    = parseInt(args[1]);
-    },
-
-    onLeave: function (retval) {
-    	filename = Memory.readUtf8String(this.filename);
-
-        send("onEnter() dlopen(\"" + filename + "\",\"" + this.flags + "\");");
-        if ( filename.indexOf("foo") != -1 ) {
-			send("do_native_hooks_libfoo now!");
-        }
-    }
-});*/
-
 // char *strstr(const char *haystack, const char *needle);
 Interceptor.attach(Module.findExportByName("libc.so", "strstr"), {
 
@@ -191,10 +171,6 @@ Interceptor.attach(ptr(p_pthread_create), {
 });
 
 
-
-
-
-
 //= Module.findExportByName("libfoo.so", "Java_sg_vantagepoint_uncrackable3_MainActivity_init");
 //var ptr_main_init1 = ptr(Process.enumerateModulesSync().filter(x=> x.name.indexOf("libfoo")>=0)[0].base).add(0x5f78);
 /*var ptr_main_init = Module.findBaseAddress("libfoo.so").add(0x5f78);  //"Java_sg_vantagepoint_uncrackable3_MainActivity_init"
@@ -214,6 +190,28 @@ Interceptor.attach(ptr(ptr_main_init), {
         return retval;
     }
 });*/
+
+
+
+// void *dlopen(const char *filename, int flags);
+/*Interceptor.attach(Module.findExportByName("libc.so", "dlopen"), {
+
+    onEnter: function (args) {
+
+        this.filename = args[0];
+        this.flags    = parseInt(args[1]);
+    },
+
+    onLeave: function (retval) {
+    	filename = Memory.readUtf8String(this.filename);
+
+        send("onEnter() dlopen(\"" + filename + "\",\"" + this.flags + "\");");
+        if ( filename.indexOf("foo") != -1 ) {
+			send("do_native_hooks_libfoo now!");
+        }
+    }
+});*/
+
 
 send("Done with native hooks....");
 
