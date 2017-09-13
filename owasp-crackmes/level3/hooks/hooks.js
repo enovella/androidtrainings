@@ -41,7 +41,7 @@ Interceptor.attach(Module.findExportByName("libc.so", "strstr"), {
         needle   = Memory.readUtf8String(this.needle);
 
         //send("onEnter() strstr(\"" + haystack + "\",\"" + needle + "\");");
-        if ( haystack.indexOf("frida") != -1 || haystack.indexOf("xposed") != -1 ) {
+        if ( haystack.indexOf("frida") !== -1 || haystack.indexOf("xposed") !== -1 ) {
         	//send("onEnter() strstr(\"" + haystack + "\",\"" + needle + "\");");
 			//send("onEnter() Frida/Xposed hooked!");
 			this.frida = Boolean(1);
