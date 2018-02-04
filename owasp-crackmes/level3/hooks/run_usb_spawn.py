@@ -1,8 +1,12 @@
 ﻿# -*- coding: utf-8 -*-
-import frida, sys, re
+import frida, sys, re, sys, os
+from subprocess import Popen, PIPE, STDOUT
 import codecs, time
 
-APP_NAME = "sg.vantagepoint.uncrackable3"
+if (len(sys.argv) > 1):
+    APP_NAME = str(sys.argv[1])
+else:
+    APP_NAME = "sg.vantagepoint.uncrackable3"
 
 def sbyte2ubyte(byte):
     return (byte % 256)
@@ -18,9 +22,12 @@ def on_message(message, data):
         elif type(data) is list:
             a = data[0]
             if type(a) is int:
-                print_result("".join([("%02X" % (sbyte2ubyte(a))) for a in data]))
+                hexstr = "".join([("%02X" % (sbyte2ubyte(a))) for a in data])
+                print_result(hexstr)
+                print_result(hexstr.decode('hex'))
             else:
                 print_result(data)
+                print_result(hexstr.decode('hex'))
         else:
             print_result(data)
     else:
@@ -29,16 +36,28 @@ def on_message(message, data):
         else:
             print_result(message)
 
-with codecs.open("hooks.js", 'r', encoding='utf8') as f:
-    jscode  = f.read()
-    device  = frida.get_usb_device(timeout=5)
-    pid     = device.spawn([APP_NAME])
-    session = device.attach(pid)
-    print ("pid: {}".format(pid))
-    script  = session.create_script(jscode)
-    device.resume(APP_NAME)
-    script.on('message', on_message)
-    print ("[*] Intercepting ...")
-    script.load()
-    sys.stdin.read()
+
+def kill_process():
+    cmd = "adb shell pm clear {} 1> /dev/null".format(APP_NAME)
+    os.system(cmd)
+
+kill_process()
+
+try:
+    with codecs.open("hooks.js", 'r', encoding='utf8') as f:
+        jscode  = f.read()
+        device  = frida.get_usb_device(timeout=5)
+        pid     = device.spawn([APP_NAME])
+        session = device.attach(pid)
+        script  = session.create_script(jscode)
+        device.resume(APP_NAME)
+        script.on('message', on_message)
+        print ("[*] Intercepting on {} (pid:{})...".format(APP_NAME,pid))
+        script.load()
+        sys.stdin.read()
+except KeyboardInterrupt:
+        print ("[!] Killing app...")
+        kill_process()
+        time.sleep(1)
+        kill_process()
 
